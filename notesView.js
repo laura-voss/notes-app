@@ -1,17 +1,42 @@
 class NotesView {
-  constructor(model) {
-    this.model = model
+  constructor(model, api) {
+    this.model = model;
+    this.api = api;
     this.mainContainerEl = document.querySelector('#main-container');
+
+    document.querySelector('#add-note-btn').addEventListener('click', () => {
+      const newNote = document.querySelector('#add-note-input').value;
+      this.addNewNote(newNote);
+    });
+  }
+
+  addNewNote(newNote) {
+    this.model.addNote(newNote);
+    this.displayNotes();
+  }
+
+  displayNotesFromApi() {
+    this.api.loadNotes((notes) => {
+      this.model.setNotes(notes);
+      this.displayNotes();
+    });
   }
 
   displayNotes() {
-    const notesList = this.model.getNotes();
+    // remove all previous notes
+    document.querySelectorAll('.note').forEach(element => {
+      element.remove();
+    });
 
-    notesList.forEach(note => {
-      const newDiv = document.createElement("div");
-      newDiv.innerText = note;
-      newDiv.className = "note";
-      this.mainContainerEl.append(newDiv);
+    const notes = this.model.getNotes();
+
+    notes.forEach(note => {
+      const noteEl = document.createElement("div");
+      noteEl.innerText = note;
+      noteEl.className = "note";
+
+      document.querySelector('#add-note-input').value = '';
+      this.mainContainerEl.append(noteEl);
     });
   };
 }
